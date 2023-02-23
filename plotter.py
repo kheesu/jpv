@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 mpl.rcParams['figure.dpi'] = 600
 mpl.rcParams['font.size'] = 7
-
+#plt.rcParams['font.family'] = 'sans-serif'
+#plt.rcParams['font.sans-serif'] = ['Arial']
 
 def str_to_datetime(datestr):
     return datetime.strptime(datestr, '%Y-%m-%dT%H:%M:%SZ')
