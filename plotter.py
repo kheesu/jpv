@@ -19,3 +19,28 @@ data = json.load(file)
 #TODO: use try except to catch files with invalid format
 dat0 = data['DiagnosticData']['LFPTrendLogs']['HemisphereLocationDef.Left']
 
+cnt = 0
+arr = [[], []]
+
+for i in dat0:
+    for j in dat0[i]:
+        arr[0].append(str_to_datetime(j['DateTime']))
+        arr[1].append(j['LFP'])
+
+d = {'time':arr[0], 'LFP':arr[1]}
+df = pd.DataFrame(data=d)
+
+df.sort_values(by='time', inplace=True)
+
+plt.plot(df['time'], df['LFP'])
+plt.savefig('wholeplot.png')
+
+starttime = input('Enter the start of the range of date to display in the format of YYYY-MM-DD: ')
+endtime = input('Enter the end of the range of date to display in the format of YYYY-MM-DD: ')
+
+df['time'] = pd.to_datetime(df['time'])
+mask = (df['time'] > starttime) & (df['time'] <= endtime)
+
+newdf = df.loc[mask]
+plt.plot(newdf['time'], newdf['LFP'])
+plt.savefig('rangeplot.png')
