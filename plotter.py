@@ -34,6 +34,7 @@ df.sort_values(by='time', inplace=True)
 
 plt.plot(df['time'], df['LFP'])
 plt.savefig('wholeplot.png')
+plt.clf()
 
 starttime = input('Enter the start of the range of date to display in the format of YYYY-MM-DD: ')
 endtime = input('Enter the end of the range of date to display in the format of YYYY-MM-DD: ')
