@@ -30,13 +30,18 @@ def raw_to_dataframe(data):
     return df
 
 def print_fig(df, name):
+    plt.xlabel('Time')
+    plt.ylabel('LFP')
     plt.plot(df['time'], df['LFP'])
     plt.savefig('pictures/' + name)
     plt.clf()
 
 def print_two_figs(Ldf, Rdf, name):
-    plt.plot(Ldf['time'], Ldf['LFP'], alpha=0.6)
-    plt.plot(Rdf['time'], Rdf['LFP'], alpha=0.6)
+    plt.xlabel('Time')
+    plt.ylabel('LFP')
+    plt.plot(Ldf['time'], Ldf['LFP'], alpha=0.6, label='Left')
+    plt.plot(Rdf['time'], Rdf['LFP'], alpha=0.6, label='Right')
+    plt.legend()
     plt.savefig('pictures/both/' + name)
     plt.clf()
 
@@ -83,7 +88,9 @@ for filename in filenames:
         dailyLdf = Ldf.loc[(Ldf['date'] == curday)]
         dailyRdf = Rdf.loc[(Rdf['date'] == curday)]
 
+        plt.title('Left Hemisphere ' + str(curday))
         print_fig(dailyLdf, '/left/LHEMI_' + str(curday) + '_' + stripped_filename + '.png')
+        plt.title('Right Hemisphere ' + str(curday))
         print_fig(dailyRdf, '/right/RHEMI_' + str(curday) + '_' + stripped_filename + '.png')
         print_two_figs(dailyLdf, dailyRdf, 'BOTH_' + str(curday) + '_' + stripped_filename + '.png')
 
