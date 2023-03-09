@@ -33,7 +33,7 @@ def print_fig(df, name):
     plt.xlabel('Time')
     plt.ylabel('LFP')
     plt.plot(df['time'], df['LFP'])
-    plt.savefig('pictures/' + name)
+    plt.savefig(os.path.join('pictures', name))
     plt.clf()
 
 def print_two_figs(Ldf, Rdf, name):
@@ -42,43 +42,53 @@ def print_two_figs(Ldf, Rdf, name):
     plt.plot(Ldf['time'], Ldf['LFP'], alpha=0.6, label='Left')
     plt.plot(Rdf['time'], Rdf['LFP'], alpha=0.6, label='Right')
     plt.legend()
-    plt.savefig('pictures/both/' + name)
+    plt.savefig(os.path.join('pictures', 'both', name))
     plt.clf()
 
+filenames = [os.path.join('infiles/', f) for f in os.listdir('infiles/') if os.path.isfile(os.path.join('infiles/', f))]
+
+"""
 file = open('infiles.txt')
 filenames = file.readlines()
 filenames = [l.strip('\n\r') for l in filenames]
+filenames = list(filter(None, filenames))
+"""
 
 if not os.path.exists('pictures'):
     os.makedirs('pictures')
-    os.makedirs('pictures/both')
-    os.makedirs('pictures/left')
-    os.makedirs('pictures/right')
+    os.makedirs(os.path.join('pictures', 'both'))
+    os.makedirs(os.path.join('pictures', 'left'))
+    os.makedirs(os.path.join('pictures', 'right'))
 
 if not os.path.exists('pictures/both'):
-    os.makedirs('pictures/both')
+    os.makedirs(os.path.join('pictures', 'both'))
 
 if not os.path.exists('pictures/left'):
-    os.makedirs('pictures/left')
+    os.makedirs(os.path.join('pictures', 'left'))
 
 if not os.path.exists('pictures/right'):
-    os.makedirs('pictures/right')
+    os.makedirs(os.path.join('pictures', 'right'))
 
 for filename in filenames:
 
     rawfile = open(filename)
 
     data = json.load(rawfile)
-    datL = data['DiagnosticData']['LFPTrendLogs']['HemisphereLocationDef.Left']
-    datR = data['DiagnosticData']['LFPTrendLogs']['HemisphereLocationDef.Right']
+    try:
+        datL = data['DiagnosticData']['LFPTrendLogs']['HemisphereLocationDef.Left']
+        datR = data['DiagnosticData']['LFPTrendLogs']['HemisphereLocationDef.Right']
+    except:
+        print('Invalid input, skipping', filename + '...')
+        continue
 
     Ldf = raw_to_dataframe(datL)
     Rdf = raw_to_dataframe(datR)
 
-    stripped_filename = filename.split('.')[0]
+    stripped_filename = os.path.split(filename)[1]
+    stripped_filename = stripped_filename.split('.')[0]
 
-    print_fig(Ldf, '/left/LHEMI_ALL_' + stripped_filename + '.png')
-    print_fig(Ldf, '/right/RHEMI_ALL_' + stripped_filename + '.png')
+    print_fig(Ldf, os.path.join('left', 'LHEMI_ALL_' + stripped_filename + '.png'))
+    print_fig(Ldf, os.path.join('right', 'RHEMI_ALL_' + stripped_filename + '.png'))
     print_two_figs(Ldf, Rdf, 'BOTH_ALL_' + stripped_filename + '.png')
 
     curday = Ldf.iloc[0][0].date()
@@ -89,9 +99,9 @@ for filename in filenames:
         dailyRdf = Rdf.loc[(Rdf['date'] == curday)]
 
         plt.title('Left Hemisphere ' + str(curday))
-        print_fig(dailyLdf, '/left/LHEMI_' + str(curday) + '_' + stripped_filename + '.png')
+        print_fig(dailyLdf, os.path.join('left', 'LHEMI_' + str(curday) + '_' + stripped_filename + '.png'))
         plt.title('Right Hemisphere ' + str(curday))
-        print_fig(dailyRdf, '/right/RHEMI_' + str(curday) + '_' + stripped_filename + '.png')
+        print_fig(dailyRdf, os.path.join('right', 'RHEMI_' + str(curday) + '_' + stripped_filename + '.png'))
         print_two_figs(dailyLdf, dailyRdf, 'BOTH_' + str(curday) + '_' + stripped_filename + '.png')
 
         curday += timedelta(days=1)
